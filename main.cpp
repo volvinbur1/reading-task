@@ -41,16 +41,14 @@ void Config::print_all() {
 bool reading_is_finished = false;
 list<string> content;
 
-Config config("config.toml");
-
-void read_file_content() {
-	for (string name : config.file_names) {
+void read_file_content(Config* config) {
+	for (string name : config->file_names) {
 		content.push_back("__" + name + "__");
 
 		{
 			unique_ptr<ifstream> input(new ifstream);// = make_unique<ifstream>();
 
-			input->open(config.path + name);
+			input->open(config->path + name);
 
 			if (input->is_open()) {
 				string line;
@@ -77,7 +75,9 @@ void print_time() {
 }
 
 int main() {
-	thread content_reading(read_file_content);
+	Config config("config.toml");
+
+	thread content_reading(read_file_content, &config);
 	thread duration(print_time);
 
 	start_time = clock();
