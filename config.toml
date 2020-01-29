@@ -7,8 +7,8 @@ title = "Config to reading app"
 path = ""
 #the name of files should be listed below. Each file name should goes inside " and be spereted by comma.
 names = [
-	"f1",
-	"f2"
+	"f1.txt",
+	"f2.txt"
 ]
 
 [settings]

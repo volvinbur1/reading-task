@@ -2,8 +2,10 @@
 #include <memory>
 #include <fstream>
 #include <string>
-#include <list>
+#include <thread>
 #include <vector>
+#include <list>
+#include <ctime>
 #include "toml.hpp"
 
 using namespace std;
@@ -12,60 +14,82 @@ class Config {
 	public:
 		Config(string path);
 		void print_all();
-	private:
-		string _title;
-		string _path;
-		vector<string> _file_names;
-		float _speed;
-		int _amount_of_files;
+		string title;
+		string path;
+		vector<string> file_names;
+		float speed;
+		int amount_of_files;
 };
 
 Config::Config(string path) {
 	const auto data = toml::parse(path);
-	_title = toml::find<string>(data, "title");
-	_path = toml::find<string>(data, "file", "path");
-	_file_names = toml::find<vector<string>>(data, "file", "names");
-	_speed = toml::find<float>(data, "settings", "speed");
+	title = toml::find<string>(data, "title");
+	path = toml::find<string>(data, "file", "path");
+	file_names = toml::find<vector<string>>(data, "file", "names");
+	speed = toml::find<float>(data, "settings", "speed");
 }
 
 void Config::print_all() {
-	cout << _title << endl;
-	(_path == "") ? cout << __FILE__ << endl :  cout << _path << endl;
-	for (string name : _file_names) {
+	cout << title << endl;
+	(path == "") ? cout << __FILE__ << endl :  cout << path << endl;
+	for (string name : file_names) {
 		cout << name << "\t";
 	}
-	cout << endl << _speed << endl;
+	cout << endl << speed << endl;
 }
 
-//Config read_config() {
-//	Config output;
-//
-//	const auto data = toml::parse("config.toml");
-//	output.title = toml::find<string>(data, "title");
-//	output.path = toml::find<string>(data, "path");
-//	output.file_names = toml::find<vector<string>>(data, "names");
-//	output.speed = toml::find<float>(data, "speed");
-//
-//	{
-//		unique_ptr<ifstream> input(new ifstream);// = make_unique<ifstream>();
-//		
-//		input->open("config.toml");
-//		
-//		if (input->is_open()) {
-//			string line;
-//			while (getline(*input, line))
-//				output.push_back(line);
-//		}
-//	}
-//	return output;
-//}
+bool reading_is_finished = false;
+list<string> content;
 
+Config config("config.toml");
 
+void read_file_content() {
+	for (string name : config.file_names) {
+		content.push_back("__" + name + "__");
+
+		{
+			unique_ptr<ifstream> input(new ifstream);// = make_unique<ifstream>();
+
+			input->open(config.path + name);
+
+			if (input->is_open()) {
+				string line;
+				while (getline(*input, line))
+					content.push_back(line);
+			}
+		}
+	}
+	reading_is_finished = true;
+}
+
+clock_t start_time = 0, end_time;
+
+void print_time() {
+	clock_t now = clock();
+	end_time = now;
+	string dots = "";
+
+	system("cls");
+
+	cout << "Reading continues" + dots << endl;
+	dots += ".";
+	cout << "Time has passed " << now - start_time << " seconds" << endl;
+}
 
 int main() {
-	Config config("config.toml");
+	thread content_reading(read_file_content);
+	thread duration(print_time);
 
-	config.print_all();
+	start_time = clock();
+
+	content_reading.join();
+	duration.join();
+
+	for (string str : content) {
+		cout << str << endl;
+	}
+
+	cout << "Whole reading took " << (end_time - start_time) / CLOCKS_PER_SEC << " seconds" << endl;
 
 	system("pause");
 
