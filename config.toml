@@ -1,0 +1,14 @@
+#This is config for reading from file app
+
+[file]
+#path is empty if file is in the same directory
+path = ""
+#the name of files should be listed below. 
+names = [
+	"f1",
+	"f2"
+]
+
+[settings]
+#speed of reading. Value in Mb/sec
+speed = 1
