@@ -9,11 +9,11 @@
 #include "Config.h"
 
 #pragma warning(disable : 4996)
-
+//#define CLOCK_PER_MSEC CLOCK_PER_SEC / 1000;
 using namespace std;
 
 bool reading_is_finished = false;
-uint64_t number_of_bits = 0;
+uint64_t number_of_all_bytes = 0;
 list<string> content;
 
 void read_file_content(Config* config) {
@@ -21,7 +21,7 @@ void read_file_content(Config* config) {
 		content.push_back("__" + name + "__");
 
 		{
-			auto stream = unique_ptr<FILE, decltype(&fclose)>(fopen(name.c_str(), "rb"), &fclose);
+			auto stream = unique_ptr<FILE, decltype(&fclose)>(fopen((config->path + name).c_str(), "rb"), &fclose);
 			
 			if (stream != NULL) {
 				fseek(stream.get(), 0, SEEK_END);
@@ -30,23 +30,28 @@ void read_file_content(Config* config) {
 
 				//cout << size << endl;
 
+				clock_t start = clock();
+				uint16_t read_bytes = 0;
+
 				while (ftell(stream.get()) < size) {
-					uint32_t bytes;
-					fread(&bytes, sizeof(uint32_t), 1, stream.get());
-					content.push_back(to_string(bytes));
-					fseek(stream.get(), sizeof(uint32_t), SEEK_CUR);
-					number_of_bits += sizeof(uint32_t) * 8;
+					if (read_bytes <= config->speed || config->speed == -1) {
+						uint32_t bytes;
+
+						fread(&bytes, sizeof(bytes), 1, stream.get());
+						content.push_back(to_string(bytes));
+						fseek(stream.get(), sizeof(bytes), SEEK_CUR);
+
+						number_of_all_bytes += sizeof(bytes);
+						read_bytes += sizeof(bytes);
+					}
+					else {
+						while ((clock() - start) <= CLOCKS_PER_SEC);// cout << "here is a loop";
+						//number_of_all_bytes += read_bytes;
+						read_bytes = 0;
+						start = clock();
+					}
 				}
 			}
-			//unique_ptr<ifstream> input(new ifstream);// = make_unique<ifstream>();
-
-			//input->open(config->path + name);
-
-			//if (input->is_open()) {
-			//	string line;
-			//	while (getline(*input, line))
-			//		content.push_back(line);
-			//}
 		}
 	}
 	reading_is_finished = true;
@@ -55,16 +60,17 @@ void read_file_content(Config* config) {
 clock_t start_time = 0, end_time;
 
 void print_time() {
+	string dots = "";
 	while (!reading_is_finished) {
 		clock_t now = clock();
 		end_time = now;
-		string dots = "";
 
 		system("cls");
 
 		cout << "Reading continues" + dots << endl;
 		dots += ".";
-		cout << "Time has passed " << now - start_time << " seconds" << endl;
+		cout << "Time has passed " << (double) (now - start_time) / CLOCKS_PER_SEC << " seconds" << endl;
+		cout << "How many values have already been read " << content.size() << endl;
 	}
 }
 
@@ -79,15 +85,15 @@ int main() {
 	content_reading.join();
 	duration.join();
 
-	for (string str : content) {
+	/*for (string str : content) {
 		cout << str << endl;
-	}
+	}*/
 
-	clock_t tooked_time = end_time - start_time;
+	clock_t took_time = end_time - start_time;
 
-	cout << "Whole reading took " << (double) tooked_time / CLOCKS_PER_SEC << " seconds" << endl;
-	cout << "Speed of reading " << (double) number_of_bits / tooked_time << " bits per clock" << endl;
-
+	cout << "Whole reading took " << (double) took_time / CLOCKS_PER_SEC << " seconds" << endl;
+	cout << "Speed of reading " << (double) (number_of_all_bytes * CLOCKS_PER_SEC) / took_time << " bytes per second" << endl;
+	
 	system("pause");
 
 	return 0;

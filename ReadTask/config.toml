@@ -12,5 +12,6 @@ names = [
 ]
 
 [settings]
-#speed of reading. Value in Mb/sec
-speed = 1.0
+#speed of reading. Value in Kbyte/sec
+#speed shoud be equal to "-1.0" to read without limitation
+speed = 25.0
