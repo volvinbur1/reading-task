@@ -4,6 +4,9 @@
 #include <string>
 #include <bitset>
 #include <ctime>
+
+#define POWER 16
+
 #pragma warning(disable : 4996)
 
 using namespace std;
@@ -14,7 +17,7 @@ uint64_t write_binary(char* path) {
 	auto stream = unique_ptr<FILE, decltype(&fclose)>(fopen(path, "wb"), &fclose);
 	
 	if (stream != NULL) {
-		for (uint32_t i = 0; i < UINT32_MAX / pow(2, 16); i++) {
+		for (uint32_t i = 0; i < UINT32_MAX / pow(2, POWER); i++) {
 			//char binary_array[32];
 			string binary = bitset<32>(i).to_string();
 			//strcpy(binary_array, binary.c_str());
