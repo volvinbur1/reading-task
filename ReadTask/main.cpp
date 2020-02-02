@@ -77,23 +77,24 @@ void print_time() {
 int main() {
 	Config config("config.toml");
 
-	thread content_reading(read_file_content, &config);
-	thread duration(print_time);
+	if (!config.error) {
+		thread content_reading(read_file_content, &config);
+		thread duration(print_time);
 
-	start_time = clock();
+		start_time = clock();
 
-	content_reading.join();
-	duration.join();
+		content_reading.join();
+		duration.join();
 
-	/*for (string str : content) {
-		cout << str << endl;
-	}*/
+		/*for (string str : content) {
+			cout << str << endl;
+		}*/
 
-	clock_t took_time = end_time - start_time;
+		clock_t took_time = end_time - start_time;
 
-	cout << "Whole reading took " << (double) took_time / CLOCKS_PER_SEC << " seconds" << endl;
-	cout << "Speed of reading " << (double) (number_of_all_bytes * CLOCKS_PER_SEC) / took_time << " bytes per second" << endl;
-	
+		cout << "Whole reading took " << (double)took_time / CLOCKS_PER_SEC << " seconds" << endl;
+		cout << "Speed of reading " << (double)(number_of_all_bytes * CLOCKS_PER_SEC) / took_time << " bytes per second" << endl;
+	}
 	system("pause");
 
 	return 0;

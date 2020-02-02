@@ -14,6 +14,7 @@ Config::Config(string _path) {
 	}
 	catch (const toml::exception& e) {
 		cout << e.what() << endl;
+		error = true;
 	}
 	_speed_convert();
 	_path_corect();

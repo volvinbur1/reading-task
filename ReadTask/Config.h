@@ -13,7 +13,9 @@ public:
 	vector<string> file_names;
 	float speed;
 	int amount_of_files;
+	bool error = false; // true when an error was occurred while config file was been reading
 private:
 	void _speed_convert();
+	void _path_corect();
 };
 
