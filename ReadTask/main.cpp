@@ -15,6 +15,8 @@ using namespace std;
 bool reading_is_finished = false;
 uint64_t number_of_all_bytes = 0;
 list<string> content;
+bool file_read = false;
+string error = "";
 
 void read_file_content(Config* config) {
 	for (string name : config->file_names) {
@@ -51,7 +53,10 @@ void read_file_content(Config* config) {
 						start = clock();
 					}
 				}
+				file_read = true;
 			}
+			else
+				error += "[error] File " + config->path + name + " does not exist\n";
 		}
 	}
 	reading_is_finished = true;
@@ -92,8 +97,12 @@ int main() {
 
 		clock_t took_time = end_time - start_time;
 
-		cout << "Whole reading took " << (double)took_time / CLOCKS_PER_SEC << " seconds" << endl;
-		cout << "Speed of reading " << (double)(number_of_all_bytes * CLOCKS_PER_SEC) / took_time << " bytes per second" << endl;
+		if (!error.empty())
+			cout << endl << error << endl;
+		if (file_read) {
+			cout << "Whole reading took " << (double)took_time / CLOCKS_PER_SEC << " seconds" << endl;
+			cout << "Speed of reading " << (double)(number_of_all_bytes * CLOCKS_PER_SEC) / took_time << " bytes per second" << endl;
+		}
 	}
 	system("pause");
 
