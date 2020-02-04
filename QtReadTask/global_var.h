@@ -4,12 +4,14 @@
 #include <ctime>
 #include <QString>
 #include <QList>
+#include <QThread>
+#include "filereader.h"
+#include "timer.h"
 
-extern bool reading_is_finished;
-extern quint64 number_of_all_bytes;
-extern bool file_read;
-extern clock_t start_time, end_time;
-extern QString error;
-extern QList<QString> content;
+extern bool reading_end;
+extern FileReader file_reader;
+extern Timer timer;
+extern QThread reading_thread;
+extern QThread timer_thread;
 
 #endif // GLOBAL_VAR_H
