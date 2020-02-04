@@ -1,0 +1,17 @@
+#This is config for reading from file app
+
+title = "Config to reading app"
+
+[file]
+#path is empty if file is in the same directory
+path = "E:\\Program\\Read from files task\\ReadTask\\GenerateBinSeq"
+#the name of files should be listed below. Each file name should goes inside " and be spereted by comma.
+names = [
+	"f.bin",
+	"f2.bin"
+]
+
+[settings]
+#speed of reading. Value in Kbyte/sec
+#speed shoud be equal to "-1.0" to read without limitation
+speed = -22.0
