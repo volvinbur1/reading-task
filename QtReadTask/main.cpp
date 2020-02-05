@@ -1,10 +1,9 @@
 #include <QCoreApplication>
 #include <QDebug>
-#include "config.h"
 #include <memory>
-#include <thread>
 #include <cstdio>
 #include "global_var.h"
+#include "config.h"
 
 //#pragma warning(disable : 4996)
 using namespace std;
@@ -19,11 +18,11 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    FileReader::connect(&reading_thread, &QThread::start, &file_reader, &FileReader::run);
-    Timer::connect(&timer_thread, &QThread::start, &timer, &Timer::run);
+    QObject::connect(&reading_thread, &QThread::start, &file_reader, &FileReader::run);
+    QObject::connect(&timer_thread, &QThread::start, &timer, &Timer::run);
 
-    FileReader::connect(&file_reader, &FileReader::finished, &reading_thread, &QThread::terminate);
-    Timer::connect(&timer, &Timer::finished, &timer_thread, &QThread::terminate);
+    QObject::connect(&file_reader, &FileReader::finished, &reading_thread, &QThread::terminate);
+    QObject::connect(&timer, &Timer::finished, &timer_thread, &QThread::terminate);
 
     file_reader.moveToThread(&reading_thread);
     timer.moveToThread(&timer_thread);

@@ -15,6 +15,11 @@ QList<QString> FileReader::content() const
     return m_content;
 }
 
+quint64 FileReader::number_of_all_bytes() const
+{
+    return m_number_of_all_bytes;
+}
+
 bool *FileReader::reading_end() const
 {
     return m_reading_end;
